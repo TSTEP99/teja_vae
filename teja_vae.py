@@ -29,6 +29,6 @@ class teja_vae(nn.Module):
         means, log_vars = self.encoder(x)
 
         #Passes mean and log variance throught decoder to try to reconstruct original tensor
-        x_hat = self.decoder(means, log_vars)
+        tensor_mean, tensor_log_var = self.decoder(means, log_vars)
 
-        return x_hat
+        return tensor_mean, tensor_log_var

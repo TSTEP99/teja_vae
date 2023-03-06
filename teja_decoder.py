@@ -89,16 +89,17 @@ class teja_decoder(nn.Module):
 
         elements_log_var = self.FC_log_var(hidden)
 
-        #Samples on a per element basis using output of decoder layers
-        sample_elements = self._reparameterization(elements_mean, elements_log_var)
+        # #Samples on a per element basis using output of decoder layers
+        # sample_elements = self._reparameterization(elements_mean, elements_log_var)
 
         #Creates original shape of tensor
         original_shape=[mean.shape[0]]
         original_shape.extend(self._other_dims)
 
-        reconstructed_tensor = sample_elements.view(*original_shape)
+        return_mean = elements_mean.view(*original_shape)
+        return_log_var = elements_log_var.view(*original_shape)
 
-        return reconstructed_tensor
+        return return_mean, return_log_var
         
 
     def _create_indices(self,dims):

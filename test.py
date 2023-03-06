@@ -1,4 +1,7 @@
-"""File to test the functionality of all implemented modules in Teja-VAE"""
+"""
+File to test the functionality of all implemented modules in Teja-VAE
+Note: These tests are now invalid will need to update in the future
+"""
 from teja_encoder import teja_encoder
 from teja_decoder import teja_decoder
 from teja_vae import teja_vae
