@@ -25,16 +25,16 @@ class teja_encoder(nn.Module):
         if isinstance(stride, int):
             stride = (stride, stride)
 
-        #First (and possibly only) convolutional layer
-        self.conv1 = nn.Conv2d(1, output_channels, kernel_size = kernel_size, stride = stride, device = device)
+        # #First (and possibly only) convolutional layer
+        # self.conv1 = nn.Conv2d(1, output_channels, kernel_size = kernel_size, stride = stride, device = device)
 
-        #Computed input size (input_size) to fully connected layer (formulas are from pytorch documentation)
-        h_out = floor((other_dims[0] - (kernel_size[0] - 1) - 1)/stride[0] + 1)
-        w_out = floor((other_dims[1] - (kernel_size[1] - 1) - 1)/stride[1] + 1)
-        input_size = h_out * w_out * output_channels
+        # #Computed input size (input_size) to fully connected layer (formulas are from pytorch documentation)
+        # h_out = floor((other_dims[0] - (kernel_size[0] - 1) - 1)/stride[0] + 1)
+        # w_out = floor((other_dims[1] - (kernel_size[1] - 1) - 1)/stride[1] + 1)
+        # input_size = h_out * w_out * output_channels
 
         #Fully Connected Layer to compute hidden layer
-        self.FC_input = nn.Linear(in_features = input_size, out_features = hidden_layer_size, device = device)
+        self.FC_input = nn.Linear(in_features = torch.prod(torch.tensor(other_dims)).item(), out_features = hidden_layer_size, device = device)
 
         #Fully Connected Layer to compute mean of latent space
         self.FC_mean = nn.Linear(in_features = hidden_layer_size, out_features = rank, device = device)
@@ -50,19 +50,22 @@ class teja_encoder(nn.Module):
     def forward(self, x):
         """Forward operation of Teja-VAE computes the mean and log variance of the epoch/sample matrices"""
         
-        #Add a channel dimension in the original dimensions of the tensor
-        if x.shape[0] != 4:
-           x = torch.unsqueeze(x, 1)
+        # #Add a channel dimension in the original dimensions of the tensor
+        # if x.shape[0] != 4:
+        #    x = torch.unsqueeze(x, 1)
 
-        #Compute the convulutional layer output
-        conv_output = self.conv1(x)
+        #Flatten input tensor
+        x = x.view(x.shape[0],-1)
 
-        #Reshape the input for a fully connected layer
-        fully_connected_input = conv_output.view((conv_output.shape[0],-1))
+        # #Compute the convulutional layer output
+        # conv_output = self.conv1(x)
+
+        # #Reshape the input for a fully connected layer
+        # fully_connected_input = conv_output.view((conv_output.shape[0],-1))
         
 
         #Compute hidden for fully connected layers
-        hidden_layer_output = self.FC_input(fully_connected_input)
+        hidden_layer_output = self.activation(self.FC_input(x))
 
         #Compute the mean of epoch/sample factor matrix (latent space)
         mean = self.FC_mean(hidden_layer_output)

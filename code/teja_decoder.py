@@ -88,19 +88,17 @@ class teja_decoder(nn.Module):
 
 
         #NOTE: use ReLU Activation
-        elements_mean = self.FC_mean(hidden)
+        elements_mean = self.sigmoid(self.FC_mean(hidden))
 
         elements_log_var = self.FC_log_var(hidden)
 
         # #Samples on a per element basis using output of decoder layers
         # sample_elements = self._reparameterization(elements_mean, elements_log_var)
 
-        #Creates original shape of tensor
-        original_shape=[mean.shape[0]]
-        original_shape.extend(self._other_dims)
+        #Reshape mean and log_var to original tensor size
 
-        return_mean = elements_mean.view(*original_shape)
-        return_log_var = elements_log_var.view(*original_shape)
+        return_mean = elements_mean.view(*dims)
+        return_log_var = elements_log_var.view(*dims)
 
         return return_mean, return_log_var
         
